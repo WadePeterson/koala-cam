@@ -14,8 +14,11 @@ app.get('/record', function (req, res) {
 
 });
 
-var server = app.listen(3000, function () {
-    var capture = ffmpeg('default')
+var highlightIndex = 0;
+var command;
+
+var startRecording = function() {
+    command = ffmpeg('default')
         .inputOptions([
             '-video_device_index 0',
             '-audio_device_index 0'
@@ -26,6 +29,18 @@ var server = app.listen(3000, function () {
         .fps(60)
         .audioCodec('libmp3lame')
         .videoCodec('libx264')
-        .duration('0:05')
-        .save('camera-recording.mp4');
+        .duration('30:00')
+        .save('videos/highlights-' + highlightIndex++ + '.mp4');
+};
+
+app.listen(3000, function () {
+    startRecording();
+
+    setInterval(function(){
+        command
+            .on('error', function(){})
+            .kill('SIGINT');
+
+        startRecording();
+    }, 10000);
 });
