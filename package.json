@@ -1,0 +1,24 @@
+{
+  "name": "koala-cam",
+  "version": "0.0.1",
+  "description": "Koala Cam",
+  "main": "app.js",
+  "dependencies": {
+    "fluent-ffmpeg": "^2.0.0-rc3",
+    "express": "^4.12.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WadePeterson/koala-cam.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/WadePeterson/koala-cam/issues"
+  },
+  "homepage": "https://github.com/WadePeterson/koala-cam"
+}
