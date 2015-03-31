@@ -1,11 +1,18 @@
 var express = require('express');
 var ffmpeg = require('fluent-ffmpeg');
 var fs = require('fs');
+var _ = require('lodash');
 var app = express();
 
 app.listen(3000, function () {
-    deleteTempFiles();
+    fs.readdir('temp', function (err, fileNames) {
+        _(fileNames).map(function (fileName) {
+            return 'temp/' + fileName;
+        }).each(deleteFile).value();
+    });
+
     startRecording();
+
     setInterval(function(){
         currentCommand.kill('SIGINT');
         startRecording();
@@ -29,7 +36,7 @@ var highlightDuration = 2;
 var currentCommand;
 
 function startRecording() {
-    var tempRecordingName = 'temp/recording-' + currentTimeMillis() + '.mp4';
+    var tempRecordingPath = 'temp/recording-' + currentTimeMillis() + '.mp4';
 
     currentCommand = ffmpeg('default')
         .inputOptions([
@@ -47,42 +54,37 @@ function startRecording() {
             console.log('Transcoding started with command: ' + commandLine);
         })
         .on('end', function() {
-            deleteTempFile(tempRecordingName);
+            deleteFile(tempRecordingPath);
             console.log('Transcoding ended. What does that mean?!?!?');
         })
         .on('error', function (err) {
-            saveHighlight(tempRecordingName);
+            saveHighlight(tempRecordingPath);
             console.log('Error or intentional stoppage while transcoding video: ', err.message)
         })
-        .save(tempRecordingName);
+        .save(tempRecordingPath);
 }
 
-function saveHighlight(tempRecordingName) {
-    ffmpeg(tempRecordingName).ffprobe(function(err, metadata) {
-        ffmpeg(tempRecordingName)
+function saveHighlight(tempRecordingPath) {
+    ffmpeg(tempRecordingPath).ffprobe(function(err, metadata) {
+        ffmpeg(tempRecordingPath)
             .seekInput(Math.max(metadata.streams[0].duration - highlightDuration, 0))
             .on('error', function (err) {
                 console.log('Error saving highlight video: ', err.message);
-                deleteTempFile(tempRecordingName);
+                deleteFile(tempRecordingPath);
             })
             .on('end', function () {
-                deleteTempFile(tempRecordingName);
+                deleteFile(tempRecordingPath);
             })
             .save('highlights/highlight-' + currentTimeMillis() + '.mp4')
     });
 }
 
-function deleteTempFile(fileName) {
-    try {
-        // TODO: Fix this
-//        fs.unlink(fileName);
-    } catch(err) {
-        console.log('Error deleting temp file: ' + err.message);
-    }
-}
-
-function deleteTempFiles() {
-    // TODO: Loop over temp files. Async?
+function deleteFile(filePath) {
+    fs.unlink(filePath, function (err) {
+        if(err) {
+            console.log('Error deleting file: ' + err.message);
+        }
+    });
 }
 
 function currentTimeMillis() {

@@ -4,8 +4,9 @@
   "description": "Koala Cam",
   "main": "app.js",
   "dependencies": {
+    "express": "^4.12.3",
     "fluent-ffmpeg": "^2.0.0-rc3",
-    "express": "^4.12.3"
+    "lodash": "^3.6.0"
   },
   "devDependencies": {},
   "scripts": {
