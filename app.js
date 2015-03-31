@@ -48,7 +48,7 @@ function startRecording() {
         var videoDeviceIndex = (webcamRegex.exec(err.message) || [])[1] || 0;
         var audioDeviceIndex = (webcamRegex.exec(err.message) || [])[1] || 0;
 
-        var tempRecordingPath = 'temp/recording-' + currentTimeMillis() + '.mp4';
+        var tempRecordingPath = 'temp/recording-' + currentTimeMillis() + '.mov';
 
         currentRecording = {
             path: tempRecordingPath,
@@ -58,11 +58,7 @@ function startRecording() {
                     '-audio_device_index ' + audioDeviceIndex
                 ])
                 .inputFormat('avfoundation')
-                .format('mp4')
-                .size('640x480')
                 .fps(60)
-                .audioCodec('libmp3lame')
-                .videoCodec('libx264')
                 .duration('30:00')
                 .on('start', function (commandLine) {
                     console.log('Transcoding started with command: ' + commandLine);
@@ -81,6 +77,10 @@ function saveHighlight(tempRecordingPath, callback) {
         var highlightPath = 'highlights/highlight-' + currentTimeMillis() + '.mp4';
         ffmpeg(tempRecordingPath)
             .seekInput(Math.max(metadata.streams[0].duration - highlightDuration, 0))
+            .size('640x480')
+            .audioCodec('libmp3lame')
+            .videoCodec('libx264')
+            .format('mp4')
             .on('error', function (err) {
                 console.log('Error saving highlight video: ', err.message);
                 deleteFile(tempRecordingPath);
