@@ -48,7 +48,7 @@ function startRecording() {
         var videoDeviceIndex = (webcamRegex.exec(err.message) || [])[1] || 0;
         var audioDeviceIndex = (webcamRegex.exec(err.message) || [])[1] || 0;
 
-        var tempRecordingPath = 'temp/recording-' + currentTimeMillis() + '.mov';
+        var tempRecordingPath = 'temp/recording-' + currentTimeMillis() + '.avi';
 
         currentRecording = {
             path: tempRecordingPath,
@@ -58,8 +58,16 @@ function startRecording() {
                     '-audio_device_index ' + audioDeviceIndex
                 ])
                 .inputFormat('avfoundation')
-                .fps(60)
-                .size('640x480')
+//                .fps(60)
+//                .size('640x480')
+                .format('avi')
+                .videoBitrate('50k')
+                .videoCodec('mpeg4')
+                .size('200x?')
+                .audioBitrate('50k')
+                .audioChannels(2)
+                .audioCodec('libmp3lame')
+                .outputOptions(['-vtag DIVX'])
                 .duration('30:00')
                 .on('start', function (commandLine) {
                     console.log('Transcoding started with command: ' + commandLine);
