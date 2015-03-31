@@ -3,6 +3,7 @@ var ffmpeg = require('fluent-ffmpeg');
 var fs = require('fs');
 var _ = require('lodash');
 var app = express();
+var exec = require('child_process').exec;
 
 app.listen(3000, function () {
     fs.readdir('temp', function (err, fileNames) {
@@ -42,31 +43,37 @@ var highlightDuration = 10;
 var currentRecording = {};
 
 function startRecording() {
-    var tempRecordingPath = 'temp/recording-' + currentTimeMillis() + '.mp4';
+    exec('ffmpeg -f avfoundation -list_devices true -i ""', function (err, stdout) {
+        var webcamRegex = /\[([0-9]+)\] HD Pro Webcam/g;
+        var videoDeviceIndex = (webcamRegex.exec(err.message) || [])[1] || 0;
+        var audioDeviceIndex = (webcamRegex.exec(err.message) || [])[1] || 0;
 
-    currentRecording = {
-        path: tempRecordingPath,
-        command: ffmpeg('default')
-            .inputOptions([
-                '-video_device_index 0',
-                '-audio_device_index 0'
-            ])
-            .inputFormat('avfoundation')
-            .format('mp4')
-            .size('640x480')
-            .fps(60)
-            .audioCodec('libmp3lame')
-            .videoCodec('libx264')
-            .duration('30:00')
-            .on('start', function (commandLine) {
-                console.log('Transcoding started with command: ' + commandLine);
-            })
-            .on('end', function () {
-                deleteFile(tempRecordingPath);
-                console.log('Transcoding ended. What does that mean?!?!?');
-            })
-            .save(tempRecordingPath)
-    };
+        var tempRecordingPath = 'temp/recording-' + currentTimeMillis() + '.mp4';
+
+        currentRecording = {
+            path: tempRecordingPath,
+            command: ffmpeg('default')
+                .inputOptions([
+                    '-video_device_index ' + videoDeviceIndex,
+                    '-audio_device_index ' + audioDeviceIndex
+                ])
+                .inputFormat('avfoundation')
+                .format('mp4')
+                .size('640x480')
+                .fps(60)
+                .audioCodec('libmp3lame')
+                .videoCodec('libx264')
+                .duration('30:00')
+                .on('start', function (commandLine) {
+                    console.log('Transcoding started with command: ' + commandLine);
+                })
+                .on('end', function () {
+                    deleteFile(tempRecordingPath);
+                    console.log('Transcoding ended. What does that mean?!?!?');
+                })
+                .save(tempRecordingPath)
+        };
+    });
 }
 
 function saveHighlight(tempRecordingPath, callback) {
