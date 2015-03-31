@@ -59,6 +59,7 @@ function startRecording() {
                 ])
                 .inputFormat('avfoundation')
                 .fps(60)
+                .size('640x480')
                 .duration('30:00')
                 .on('start', function (commandLine) {
                     console.log('Transcoding started with command: ' + commandLine);
@@ -77,10 +78,6 @@ function saveHighlight(tempRecordingPath, callback) {
         var highlightPath = 'highlights/highlight-' + currentTimeMillis() + '.mp4';
         ffmpeg(tempRecordingPath)
             .seekInput(Math.max(metadata.streams[0].duration - highlightDuration, 0))
-            .size('640x480')
-            .audioCodec('libmp3lame')
-            .videoCodec('libx264')
-            .format('mp4')
             .on('error', function (err) {
                 console.log('Error saving highlight video: ', err.message);
                 deleteFile(tempRecordingPath);
