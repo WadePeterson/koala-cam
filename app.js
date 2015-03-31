@@ -12,23 +12,26 @@ app.listen(3000, function () {
     });
 
     startRecording();
-
-    setInterval(function(){
-        currentCommand.kill('SIGINT');
-        startRecording();
-    }, 10000);
 });
+
+app.use(express.static(__dirname + '/public'));
 
 app.get('/', function(req,res) {
     res.sendfile('index.html');
 });
 
-app.get('/video.mp4', function(req,res) {
-    res.sendfile('camera-recording.mp4');
+app.get('/highlights', function(req,res) {
+    fs.readdir('public/highlights', function (err, fileNames) {
+
+    });
 });
 
-app.get('/record', function (req, res) {
+app.post('/savehighlight', function(req,res) {
+    currentCommand.kill('SIGINT');
+    startRecording();
 
+    // Respond with highlight link??? something?
+    res.end();
 });
 
 var highlightDuration = 2;
@@ -75,7 +78,7 @@ function saveHighlight(tempRecordingPath) {
             .on('end', function () {
                 deleteFile(tempRecordingPath);
             })
-            .save('highlights/highlight-' + currentTimeMillis() + '.mp4')
+            .save('public/highlights/highlight-' + currentTimeMillis() + '.mp4')
     });
 }
 
