@@ -22,20 +22,13 @@ app.get('/record', function (req, res) {
 });
 
 var highlightDuration = 2;
-var command;
-var waitingToRecord = false;
-var isRecording = false;
+
+var currentCommand;
 
 function startRecording() {
-    if (isRecording || waitingToRecord) {
-        return;
-    }
-
-    waitingToRecord = true;
-
     var tempRecordingName = 'temp/recording-' + currentTimeMillis() + '.mp4';
 
-    command = ffmpeg('default')
+    currentCommand = ffmpeg('default')
         .inputOptions([
             '-video_device_index 0',
             '-audio_device_index 0'
@@ -48,8 +41,6 @@ function startRecording() {
         .videoCodec('libx264')
         .duration('30:00')
         .on('start', function(commandLine) {
-            isRecording = true;
-            waitingToRecord = false;
             console.log('Transcoding started with command: ' + commandLine);
         })
         .on('end', function() {
@@ -65,9 +56,6 @@ function startRecording() {
 }
 
 function onStopRecording(tempRecordingName) {
-    isRecording = false;
-    waitingToRecord = false;
-
     ffmpeg(tempRecordingName).ffprobe(function(err, metadata) {
         ffmpeg(tempRecordingName)
             .seekInput(Math.max(metadata.streams[0].duration - highlightDuration, 0))
@@ -83,9 +71,7 @@ function onStopRecording(tempRecordingName) {
 }
 
 function saveHighlight() {
-    if (isRecording || waitingToRecord) {
-        command.kill('SIGINT');
-    }
+    currentCommand.kill('SIGINT');
 
     startRecording();
 }
