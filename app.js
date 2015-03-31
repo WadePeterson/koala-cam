@@ -6,7 +6,10 @@ var app = express();
 app.listen(3000, function () {
     deleteTempFiles();
     startRecording();
-    setInterval(saveHighlight, 10000);
+    setInterval(function(){
+        currentCommand.kill('SIGINT');
+        startRecording();
+    }, 10000);
 });
 
 app.get('/', function(req,res) {
@@ -44,18 +47,17 @@ function startRecording() {
             console.log('Transcoding started with command: ' + commandLine);
         })
         .on('end', function() {
-            // Probably don't want this to record a highlight....
-            onStopRecording(tempRecordingName);
+            deleteTempFile(tempRecordingName);
             console.log('Transcoding ended. What does that mean?!?!?');
         })
         .on('error', function (err) {
-            onStopRecording(tempRecordingName);
+            saveHighlight(tempRecordingName);
             console.log('Error or intentional stoppage while transcoding video: ', err.message)
         })
         .save(tempRecordingName);
 }
 
-function onStopRecording(tempRecordingName) {
+function saveHighlight(tempRecordingName) {
     ffmpeg(tempRecordingName).ffprobe(function(err, metadata) {
         ffmpeg(tempRecordingName)
             .seekInput(Math.max(metadata.streams[0].duration - highlightDuration, 0))
@@ -68,12 +70,6 @@ function onStopRecording(tempRecordingName) {
             })
             .save('highlights/highlight-' + currentTimeMillis() + '.mp4')
     });
-}
-
-function saveHighlight() {
-    currentCommand.kill('SIGINT');
-
-    startRecording();
 }
 
 function deleteTempFile(fileName) {
