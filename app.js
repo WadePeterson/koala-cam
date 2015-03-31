@@ -17,7 +17,7 @@ app.listen(3000, function () {
 app.use(express.static(__dirname + '/public'));
 
 app.get('/', function(req,res) {
-    res.sendfile('index.html');
+    res.sendFile(__dirname + '/index.html');
 });
 
 app.get('/highlights', function(req,res) {
@@ -27,48 +27,51 @@ app.get('/highlights', function(req,res) {
 });
 
 app.post('/savehighlight', function(req,res) {
-    currentCommand.kill('SIGINT');
-    startRecording();
+    var recording = currentRecording;
 
-    // Respond with highlight link??? something?
-    res.end();
+    recording.command.on('error', function (err) {
+        saveHighlight(recording.path, function (highlightPath) {
+            res.send(highlightPath);
+        });
+    }).kill('SIGINT');
+
+    startRecording();
 });
 
-var highlightDuration = 2;
-
-var currentCommand;
+var highlightDuration = 10;
+var currentRecording = {};
 
 function startRecording() {
     var tempRecordingPath = 'temp/recording-' + currentTimeMillis() + '.mp4';
 
-    currentCommand = ffmpeg('default')
-        .inputOptions([
-            '-video_device_index 0',
-            '-audio_device_index 0'
-        ])
-        .inputFormat('avfoundation')
-        .format('mp4')
-        .size('640x480')
-        .fps(60)
-        .audioCodec('libmp3lame')
-        .videoCodec('libx264')
-        .duration('30:00')
-        .on('start', function(commandLine) {
-            console.log('Transcoding started with command: ' + commandLine);
-        })
-        .on('end', function() {
-            deleteFile(tempRecordingPath);
-            console.log('Transcoding ended. What does that mean?!?!?');
-        })
-        .on('error', function (err) {
-            saveHighlight(tempRecordingPath);
-            console.log('Error or intentional stoppage while transcoding video: ', err.message)
-        })
-        .save(tempRecordingPath);
+    currentRecording = {
+        path: tempRecordingPath,
+        command: ffmpeg('default')
+            .inputOptions([
+                '-video_device_index 0',
+                '-audio_device_index 0'
+            ])
+            .inputFormat('avfoundation')
+            .format('mp4')
+            .size('640x480')
+            .fps(60)
+            .audioCodec('libmp3lame')
+            .videoCodec('libx264')
+            .duration('30:00')
+            .on('start', function (commandLine) {
+                console.log('Transcoding started with command: ' + commandLine);
+            })
+            .on('end', function () {
+                deleteFile(tempRecordingPath);
+                console.log('Transcoding ended. What does that mean?!?!?');
+            })
+            .save(tempRecordingPath)
+    };
 }
 
-function saveHighlight(tempRecordingPath) {
+function saveHighlight(tempRecordingPath, callback) {
     ffmpeg(tempRecordingPath).ffprobe(function(err, metadata) {
+        var highlightPath = 'highlights/highlight-' + currentTimeMillis() + '.mp4';
         ffmpeg(tempRecordingPath)
             .seekInput(Math.max(metadata.streams[0].duration - highlightDuration, 0))
             .on('error', function (err) {
@@ -77,8 +80,9 @@ function saveHighlight(tempRecordingPath) {
             })
             .on('end', function () {
                 deleteFile(tempRecordingPath);
+                callback(highlightPath);
             })
-            .save('public/highlights/highlight-' + currentTimeMillis() + '.mp4')
+            .save('public/' + highlightPath)
     });
 }
 
