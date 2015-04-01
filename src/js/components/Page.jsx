@@ -1,9 +1,8 @@
 var React = require('react');
-var $ = require('jquery');
-var HighlightStore = require('../stores/HighlightStore');
 var ActionCreator = require('../utils/ActionCreator');
+var HighlightContainer = require('./HighlightContainer.jsx');
+var HighlightStore = require('../stores/HighlightStore');
 var Video = require('./Video.jsx');
-
 
 function getStateFromStore() {
     return {
@@ -41,6 +40,7 @@ module.exports = React.createClass({
                 <div>
                     <Video {...this.state.videoControlSettings} />
                 </div>
+                <HighlightContainer highlights={this.state.highlights} />
             </div>
         );
     },

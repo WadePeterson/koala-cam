@@ -1,8 +1,6 @@
 var React = require('react');
 
 module.exports = React.createClass({
-    displayName: 'Video',
-
     propTypes: {
         playbackRate: React.PropTypes.number.isRequired,
         src: React.PropTypes.string.isRequired

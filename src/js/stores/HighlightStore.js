@@ -32,7 +32,7 @@ HighlightStore.dispatchToken = Dispatcher.register(payload => {
             break;
         case ActionTypes.HIGHLIGHTS_RECEIVED:
             // TODO: If highlights become more than just URLs, then this needs to be smarter
-            _.highlights = _.union(_highlights, action.highlight);
+            _highlights = _.union(_highlights, action.highlights);
             break;
     }
 
