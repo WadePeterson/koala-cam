@@ -7,7 +7,7 @@ var _highlights = [];
 var _videoControlSettings = {
     panX: 0,
     panY: 0,
-    playbackSpeed: 0.5,
+    playbackRate: 0.5,
     src: null,
     zoom: 1.0
 };

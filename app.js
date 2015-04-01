@@ -6,11 +6,13 @@ var fs = require('fs');
 
 var app = express();
 
+function filterEmptyFile(fileName) {
+    return fileName !== 'empty';
+}
+
 app.listen(3000, function () {
     fs.readdir('temp', function (err, fileNames) {
-        _(fileNames).filter(function (fileName) {
-            return fileName !== 'empty';
-        }).map(function (fileName) {
+        _(fileNames).filter(filterEmptyFile).map(function (fileName) {
             return 'temp/' + fileName;
         }).each(deleteFile).value();
 
@@ -28,7 +30,7 @@ app.get('/', function(req,res) {
 
 app.get('/highlights', function(req,res) {
     fs.readdir('assets/highlights', function (err, fileNames) {
-        console.log(fileNames);
+        res.send(_(fileNames).filter(filterEmptyFile).sort().value());
     });
 });
 

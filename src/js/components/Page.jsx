@@ -21,6 +21,7 @@ module.exports = React.createClass({
 
     componentDidMount(){
         HighlightStore.addChangeListener(this._onChange);
+        ActionCreator.loadHighlights();
     },
 
     componentWillUnmount(){
@@ -32,14 +33,13 @@ module.exports = React.createClass({
     },
 
     render() {
-        debugger;
         return (
             <div>
                 <div>
                     <button className="highlight" onClick={this.createHighlight}>Capture Highlight!</button>
                 </div>
                 <div>
-                    <Video {...this.state.videoControlSettings} />
+                    <Video ref="activeVideo" {...this.state.videoControlSettings} />
                 </div>
             </div>
         );
