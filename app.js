@@ -1,29 +1,34 @@
+var _ = require('lodash');
+var exec = require('child_process').exec;
 var express = require('express');
 var ffmpeg = require('fluent-ffmpeg');
 var fs = require('fs');
-var _ = require('lodash');
+
 var app = express();
-var exec = require('child_process').exec;
 
 app.listen(3000, function () {
     fs.readdir('temp', function (err, fileNames) {
-        _(fileNames).map(function (fileName) {
+        _(fileNames).filter(function (fileName) {
+            return fileName !== 'empty';
+        }).map(function (fileName) {
             return 'temp/' + fileName;
         }).each(deleteFile).value();
-    });
 
-    startRecording();
+        exec('killall -9 ffmpeg', function () {
+            startRecording();
+        });
+    });
 });
 
 app.use(express.static(__dirname + '/assets'));
 
 app.get('/', function(req,res) {
-    res.sendFile(__dirname + '/src/jsx/index.html');
+    res.sendFile(__dirname + '/src/index.html');
 });
 
 app.get('/highlights', function(req,res) {
     fs.readdir('assets/highlights', function (err, fileNames) {
-
+        console.log(fileNames);
     });
 });
 
@@ -77,7 +82,7 @@ function saveHighlight(tempRecordingPath, callback) {
     ffmpeg(tempRecordingPath).ffprobe(function(err, metadata) {
         var highlightPath = 'highlights/highlight-' + currentTimeMillis() + '.mp4';
         ffmpeg(tempRecordingPath)
-            .seekInput(Math.max(metadata.streams[0].duration - highlightDuration, 0))
+            .seekInput(metadata ? Math.max(metadata.streams[0].duration - highlightDuration, 0) : 0)
             .on('error', function (err) {
                 console.log('Error saving highlight video: ', err.message);
                 deleteFile(tempRecordingPath);
