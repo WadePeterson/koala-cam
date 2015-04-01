@@ -14,12 +14,17 @@ html, body {
 
 #content {
   height: 100%;
+
+  > div > div {
+    margin-bottom: 20px;
+  }
 }
 
 #footer {
   background-color: #333;
   color: #CCC;
   text-align: center;
+  width: 100%;
 }
 
 video {
@@ -27,3 +32,19 @@ video {
   margin-left: auto;
   margin-right: auto;
 }
+
+.highlight-container {
+  background-color: #CCC;
+  overflow-x: scroll;
+  white-space: nowrap;
+
+  > div {
+    display: inline-block;
+    padding: 10px 10px 0 10px;
+
+    img {
+      cursor: pointer;
+    }
+  }
+}
+

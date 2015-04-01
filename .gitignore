@@ -4,5 +4,6 @@
 *.log
 assets/build
 assets/highlights/highlight*
+assets/highlights/thumbnail*
 node_modules
 temp/recording*

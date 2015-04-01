@@ -30,7 +30,11 @@ app.get('/', function(req,res) {
 
 app.get('/highlights', function(req,res) {
     fs.readdir('assets/highlights', function (err, fileNames) {
-        res.send(_(fileNames).filter(filterEmptyFile).sort().value());
+        res.send(_(fileNames)
+            .filter(filterEmptyFile)
+            .map(function (fileName) {
+                return +fileName.match('[0-9]+')[0];
+            }).unique().sort().value());
     });
 });
 
@@ -38,15 +42,15 @@ app.post('/savehighlight', function(req,res) {
     var recording = currentRecording;
 
     recording.command.on('error', function (err) {
-        saveHighlight(recording.path, function (highlightPath) {
-            res.send(highlightPath);
+        saveHighlight(recording.path, function (highlightTimestamp) {
+            res.send('' + highlightTimestamp);
         });
     }).kill('SIGINT');
 
     startRecording();
 });
 
-var highlightDuration = 10;
+var highlightDuration = 7;
 var currentRecording = {};
 
 function startRecording() {
@@ -81,8 +85,10 @@ function startRecording() {
 }
 
 function saveHighlight(tempRecordingPath, callback) {
+    var timeStamp = currentTimeMillis();
+    var highlightPath = 'assets/highlights/highlight-' + timeStamp + '.mp4';
+
     ffmpeg(tempRecordingPath).ffprobe(function(err, metadata) {
-        var highlightPath = 'highlights/highlight-' + currentTimeMillis() + '.mp4';
         ffmpeg(tempRecordingPath)
             .seekInput(metadata ? Math.max(metadata.streams[0].duration - highlightDuration, 0) : 0)
             .on('error', function (err) {
@@ -91,9 +97,24 @@ function saveHighlight(tempRecordingPath, callback) {
             })
             .on('end', function () {
                 deleteFile(tempRecordingPath);
-                callback(highlightPath);
+
+                var thumbnailName = 'thumbnail-' + timeStamp + '.jpg';
+
+                ffmpeg(highlightPath)
+                    .on('end', function () {
+                        callback(timeStamp);
+                    })
+                    .on('error', function (err) {
+                        console.log('Error saving thumbnail: ', err.message);
+                    })
+                    .thumbnail({
+                        filename: thumbnailName,
+                        timestamps: ['50%'],
+                        folder: 'assets/highlights/',
+                        size: '320x?'
+                    });
             })
-            .save('assets/' + highlightPath)
+            .save(highlightPath)
     });
 }
 

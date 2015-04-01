@@ -40,12 +40,16 @@ module.exports = React.createClass({
                 <div>
                     <Video {...this.state.videoControlSettings} />
                 </div>
-                <HighlightContainer highlights={this.state.highlights} />
+                <HighlightContainer highlights={this.state.highlights} onHighlightClick={this.changeActiveHighlight}/>
             </div>
         );
     },
 
     createHighlight() {
         ActionCreator.createHighlight();
+    },
+
+    changeActiveHighlight(highlight) {
+        ActionCreator.changeActiveHighlight(highlight);
     }
 });

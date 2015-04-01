@@ -3,13 +3,20 @@ var ActionTypes = require('./ActionTypes');
 var Dispatcher = require('../utils/Dispatcher');
 
 module.exports = {
+    changeActiveHighlight(highlight) {
+        Dispatcher.handleViewAction({
+            type: ActionTypes.CHANGE_ACTIVE_HIGHLIGHT,
+            highlight: highlight
+        });
+    },
+
     createHighlight() {
         $.ajax('savehighlight', {
             method: 'POST'
-        }).done(url => {
+        }).done(highlight => {
             Dispatcher.handleServerAction({
                 type: ActionTypes.NEW_HIGHLIGHT_RECEIVED,
-                highlight: url
+                highlight: highlight
             });
         });
     },
