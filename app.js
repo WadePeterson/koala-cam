@@ -15,14 +15,14 @@ app.listen(3000, function () {
     startRecording();
 });
 
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/assets'));
 
 app.get('/', function(req,res) {
-    res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/src/jsx/index.html');
 });
 
 app.get('/highlights', function(req,res) {
-    fs.readdir('public/highlights', function (err, fileNames) {
+    fs.readdir('assets/highlights', function (err, fileNames) {
 
     });
 });
@@ -86,7 +86,7 @@ function saveHighlight(tempRecordingPath, callback) {
                 deleteFile(tempRecordingPath);
                 callback(highlightPath);
             })
-            .save('public/' + highlightPath)
+            .save('assets/' + highlightPath)
     });
 }
 
