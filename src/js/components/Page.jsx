@@ -39,7 +39,7 @@ module.exports = React.createClass({
                     <button className="highlight" onClick={this.createHighlight}>Capture Highlight!</button>
                 </div>
                 <div>
-                    <Video ref="activeVideo" {...this.state.videoControlSettings} />
+                    <Video {...this.state.videoControlSettings} />
                 </div>
             </div>
         );

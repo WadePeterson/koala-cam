@@ -1,41 +1,29 @@
-#content {
-  background-color: lime;
-}
-
 button.highlight {
   font-size: 5em;
 }
 
-
 html, body {
-  margin:0;
-  height:100%;
-  min-height:100%;
+  margin: 0;
 }
 
-body {
-  margin:0;
-  display: flex;
-  flex-direction: column;
-}
-
-header {
-  flex: 1;
-  background:red;
+#header {
+  font-family: ComicSansMS;
+  font-size: 3em;
+  text-align: center;
 }
 
 #content {
-  flex: 8;
-  overflow-y: scroll;
-  background:green;
+  height: 100%;
 }
 
-footer {
-  flex: 1;
-  background:blue;
+#footer {
+  background-color: #333;
+  color: #CCC;
+  text-align: center;
 }
 
 video {
-  height: 100%;
-  width: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }

@@ -8,7 +8,7 @@ var _videoControlSettings = {
     panX: 0,
     panY: 0,
     playbackRate: 0.5,
-    src: null,
+    src: 'koala-fight.mp4',
     zoom: 1.0
 };
 

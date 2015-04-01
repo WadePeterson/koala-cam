@@ -17,9 +17,7 @@ module.exports = React.createClass({
     },
 
     render() {
-        return this.props.src ? (
-            <video ref="videoPlayer" controls autoPlay="true" src={this.props.src}></video>
-        ) : <div>No highlight yet!</div>;
+        return <video ref="videoPlayer" controls autoPlay="true" src={this.props.src}></video>;
     },
 
     updateVideoSettings() {
