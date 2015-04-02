@@ -77,6 +77,7 @@ function startRecording() {
                 ])
                 .inputFormat('avfoundation')
                 .fps(60)
+                .size('1000x?')
                 .duration('30:00')
                 .on('start', function (commandLine) {
                     console.log('Transcoding started with command: ' + commandLine);
