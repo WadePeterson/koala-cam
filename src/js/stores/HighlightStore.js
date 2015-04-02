@@ -41,7 +41,7 @@ HighlightStore.dispatchToken = Dispatcher.register(payload => {
             break;
         case ActionTypes.TOGGLE_HIGHLIGHT_HOTNESS:
             var highlight = _.find(_highlights, highlight => highlight.id === action.highlight.id);
-            highlight.isHot = !highlight.isHot;
+            highlight.metadata.isHot = !highlight.metadata.isHot;
             break;
         case ActionTypes.HIGHLIGHTS_RECEIVED:
             _highlights = action.highlights;

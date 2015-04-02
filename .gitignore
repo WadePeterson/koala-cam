@@ -3,6 +3,7 @@
 *.iml
 *.log
 assets/highlights/highlight*
+assets/highlights/metadata*
 assets/highlights/thumbnail*
 build
 node_modules

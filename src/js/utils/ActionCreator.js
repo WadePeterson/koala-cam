@@ -52,9 +52,12 @@ module.exports = {
     toggleHotness(highlight) {
         $.ajax('highlight/' + highlight.id, {
             method: 'POST',
-            data: {
-                hot: !highlight.isHot
-            }
+            contentType: 'application/json; charset=UTF-8',
+            data: JSON.stringify({
+                metadata: _.merge({}, highlight.metadata, {
+                    isHot: !highlight.metadata.isHot
+                })
+            })
         });
         Dispatcher.handleViewAction({
             type: ActionTypes.TOGGLE_HIGHLIGHT_HOTNESS,

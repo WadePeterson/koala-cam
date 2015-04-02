@@ -4,6 +4,7 @@
   "description": "Koala Cam",
   "main": "server.js",
   "dependencies": {
+    "body-parser": "^1.12.2",
     "css-loader": "^0.9.1",
     "express": "^4.12.3",
     "file-loader": "^0.8.1",

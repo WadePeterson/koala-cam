@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var bodyParser = require('body-parser');
 var exec = require('child_process').exec;
 var express = require('express');
 var ffmpeg = require('fluent-ffmpeg');
@@ -21,6 +22,7 @@ app.listen(3000, function () {
 
 app.use(express.static(__dirname + '/assets'));
 app.use(express.static(__dirname + '/build'));
+app.use(bodyParser.json());
 
 app.get('/', function(req,res) {
     res.sendFile(__dirname + '/src/index.html');
@@ -28,11 +30,16 @@ app.get('/', function(req,res) {
 
 app.get('/highlights', function(req,res) {
     fs.readdir('assets/highlights', function (err, fileNames) {
-        res.send(_(fileNames)
-            .filter(filterEmptyFile)
-            .map(function (fileName) {
-                return +fileName.match('[0-9]+')[0];
-            }).unique().sort().reverse().map(getHighlight).value());
+        Q.all(
+            _(fileNames)
+                .filter(filterEmptyFile)
+                .map(function (fileName) {
+                    return +fileName.match('[0-9]+')[0];
+                })
+                .unique().sort().reverse().map(getHighlight).value()
+        ).then(function (results) {
+            res.send(results);
+        });
     });
 });
 
@@ -40,8 +47,8 @@ app.put('/highlight', function(req,res) {
     var recording = currentRecording;
 
     recording.command.on('error', function () {
-        saveHighlight(recording.path).then(function (id) {
-            res.send(getHighlight(id));
+        saveHighlight(recording.path).then(getHighlight).then(function(highlight){
+            res.send(highlight);
         });
     }).kill('SIGINT');
 
@@ -49,11 +56,14 @@ app.put('/highlight', function(req,res) {
 });
 
 app.post('/highlight/:id', function(req,res) {
-    res.send(getHighlight(req.params.id));
+    writeMetadataFile(req.params.id, req.body.metadata).then(function(){
+        res.end();
+    });
 });
 
 app.delete('/highlight/:id', function(req,res) {
     deleteFile('assets/highlights/highlight-' + req.params.id + '.mp4');
+    deleteFile('assets/highlights/metadata-' + req.params.id + '.json');
     deleteFile('assets/highlights/thumbnail-' + req.params.id + '.jpg');
     res.end();
 });
@@ -93,12 +103,16 @@ function startRecording() {
 }
 
 function getHighlight(id) {
-    return {
-        id: id,
-        isHot: false,
-        thumbnailUrl: 'highlights/thumbnail-' + id + '.jpg',
-        videoUrl: 'highlights/highlight-' + id + '.mp4'
-    };
+    var deferred = Q.defer();
+    fs.readFile('assets/highlights/metadata-' + id + '.json', function(err, data) {
+        deferred.resolve({
+            id: id,
+            metadata: JSON.parse(data),
+            thumbnailUrl: 'highlights/thumbnail-' + id + '.jpg',
+            videoUrl: 'highlights/highlight-' + id + '.mp4'
+        });
+    });
+    return deferred.promise;
 }
 
 function saveHighlight(tempRecordingPath) {
@@ -107,9 +121,10 @@ function saveHighlight(tempRecordingPath) {
     return getFfmpegMetadata(tempRecordingPath)
         .then(function (ffmpegMetadata) {
             return parseTempVideo(ffmpegMetadata, tempRecordingPath, id);
-        })
-        .then(function (highlightPath) {
+        }).then(function (highlightPath) {
             return createThumbnail(highlightPath, id);
+        }).then(function () {
+            return writeMetadataFile(id, {isHot: false});
         }).then(function () {
             return id;
         });
@@ -161,8 +176,12 @@ function createThumbnail(highlightPath, id) {
     return deferred.promise;
 }
 
-function createMetadata(id) {
-
+function writeMetadataFile(id, metadata) {
+    var deferred = Q.defer();
+    fs.writeFile('assets/highlights/metadata-' + id + '.json', JSON.stringify(metadata), function(){
+        deferred.resolve();
+    });
+    return deferred.promise;
 }
 
 function filterEmptyFile(fileName) {

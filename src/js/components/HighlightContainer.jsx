@@ -11,16 +11,12 @@ module.exports = React.createClass({
 
     render() {
         var thumbs = _.map(this.props.highlights, (highlight) => {
-            var hotClasses = "hot glyphicon glyphicon-fire" + (highlight.isHot ? ' active' : '');
+            var hotClasses = "hot glyphicon glyphicon-fire" + (highlight.metadata.isHot ? ' active' : '');
             return (
                 <div className="thumbnail-container">
                     <img src={highlight.thumbnailUrl} onClick={() => this.props.onHighlightSelect(highlight)} />
-                    <Button className={hotClasses}
-                            bsSize="large"
-                            onClick={() => this.props.onHotClick(highlight)}></Button>
-                    { highlight.isHot ? null : <Button className="delete glyphicon glyphicon-trash"
-                            bsSize="large"
-                            onClick={() => this.props.onDeleteClick(highlight)}></Button> }
+                    <Button className={hotClasses} bsSize="large" onClick={() => this.props.onHotClick(highlight)}></Button>
+                    { highlight.metadata.isHot ? null : <Button className="delete glyphicon glyphicon-trash" bsSize="large" onClick={() => this.props.onDeleteClick(highlight)}></Button> }
                 </div>
             );
         });
