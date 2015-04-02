@@ -38,8 +38,10 @@ module.exports = React.createClass({
         return (
             <div>
                 <div className="controls">
-                    <Button className="highlight" onClick={this.createHighlight}>Capture Highlight!</Button>
                     <PlaybackRateControl playbackRate={this.state.videoControlSettings.playbackRate} onPlaybackRateChange={this.onPlaybackRateChange} />
+                    <div className="buttons">
+                        <Button bsStyle='success' onClick={this.createHighlight}>Capture Highlight!</Button>
+                    </div>
                 </div>
                 <div className="video-content-container">
                     <div className="video-container">
