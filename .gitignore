@@ -2,8 +2,8 @@
 .idea
 *.iml
 *.log
-assets/build
 assets/highlights/highlight*
 assets/highlights/thumbnail*
+build
 node_modules
 temp/recording*
