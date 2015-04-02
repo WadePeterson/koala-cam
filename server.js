@@ -3,6 +3,7 @@ var exec = require('child_process').exec;
 var express = require('express');
 var ffmpeg = require('fluent-ffmpeg');
 var fs = require('fs');
+var Q = require('q');
 
 var app = express();
 
@@ -38,9 +39,9 @@ app.get('/highlights', function(req,res) {
 app.put('/highlight', function(req,res) {
     var recording = currentRecording;
 
-    recording.command.on('error', function (err) {
-        saveHighlight(recording.path, function (timestamp) {
-            res.send(getHighlight(timestamp));
+    recording.command.on('error', function () {
+        saveHighlight(recording.path).then(function (id) {
+            res.send(getHighlight(id));
         });
     }).kill('SIGINT');
 
@@ -51,9 +52,9 @@ app.post('/highlight/:id', function(req,res) {
     res.send(getHighlight(req.params.id));
 });
 
-app.delete('/highlight/:timestamp', function(req,res) {
-    deleteFile('assets/highlights/highlight-' + req.params.timestamp + '.mp4');
-    deleteFile('assets/highlights/thumbnail-' + req.params.timestamp + '.jpg');
+app.delete('/highlight/:id', function(req,res) {
+    deleteFile('assets/highlights/highlight-' + req.params.id + '.mp4');
+    deleteFile('assets/highlights/thumbnail-' + req.params.id + '.jpg');
     res.end();
 });
 
@@ -66,7 +67,7 @@ function startRecording() {
         var videoDeviceIndex = (webcamRegex.exec(err.message) || [])[1] || 0;
         var audioDeviceIndex = (webcamRegex.exec(err.message) || [])[1] || 0;
 
-        var tempRecordingPath = 'temp/recording-' + currentTimeMillis() + '.mov';
+        var tempRecordingPath = 'temp/recording-' + generateId() + '.mov';
 
         currentRecording = {
             path: tempRecordingPath,
@@ -100,38 +101,68 @@ function getHighlight(id) {
     };
 }
 
-function saveHighlight(tempRecordingPath, callback) {
-    var timeStamp = currentTimeMillis();
-    var highlightPath = 'assets/highlights/highlight-' + timeStamp + '.mp4';
+function saveHighlight(tempRecordingPath) {
+    var id = generateId();
 
-    ffmpeg(tempRecordingPath).ffprobe(function(err, metadata) {
-        ffmpeg(tempRecordingPath)
-            .seekInput(metadata ? Math.max(metadata.streams[0].duration - highlightDuration, 0) : 0)
-            .on('error', function (err) {
-                console.log('Error saving highlight video: ', err.message);
-                deleteFile(tempRecordingPath);
-            })
-            .on('end', function () {
-                deleteFile(tempRecordingPath);
+    return getFfmpegMetadata(tempRecordingPath)
+        .then(function (ffmpegMetadata) {
+            return parseTempVideo(ffmpegMetadata, tempRecordingPath, id);
+        })
+        .then(function (highlightPath) {
+            return createThumbnail(highlightPath, id);
+        }).then(function () {
+            return id;
+        });
+}
 
-                var thumbnailName = 'thumbnail-' + timeStamp + '.jpg';
+function parseTempVideo(ffmpegMetadata, tempRecordingPath, id) {
+    var highlightPath = 'assets/highlights/highlight-' + id + '.mp4';
 
-                ffmpeg(highlightPath)
-                    .on('end', function () {
-                        callback(timeStamp);
-                    })
-                    .on('error', function (err) {
-                        console.log('Error saving thumbnail: ', err.message);
-                    })
-                    .thumbnail({
-                        filename: thumbnailName,
-                        timestamps: ['50%'],
-                        folder: 'assets/highlights/',
-                        size: '320x?'
-                    });
-            })
-            .save(highlightPath)
+    var deferred = Q.defer();
+    ffmpeg(tempRecordingPath)
+        .seekInput(ffmpegMetadata ? Math.max(ffmpegMetadata.streams[0].duration - highlightDuration, 0) : 0)
+        .on('error', function (err) {
+            console.log('Error saving highlight video: ', err.message);
+            deleteFile(tempRecordingPath);
+        })
+        .on('end', function () {
+            deleteFile(tempRecordingPath);
+            deferred.resolve(highlightPath);
+        })
+        .save(highlightPath)
+    return deferred.promise;
+}
+
+function getFfmpegMetadata(videoFilePath) {
+    var deferred = Q.defer();
+    ffmpeg(videoFilePath).ffprobe(function(err, metadata) {
+        deferred.resolve(metadata);
     });
+    return deferred.promise;
+}
+
+function createThumbnail(highlightPath, id) {
+    var deferred = Q.defer();
+    var thumbnailName = 'thumbnail-' + id + '.jpg';
+
+    ffmpeg(highlightPath)
+        .on('end', function () {
+            deferred.resolve();
+        })
+        .on('error', function (err) {
+            console.log('Error saving thumbnail: ', err.message);
+        })
+        .thumbnail({
+            filename: thumbnailName,
+            timestamps: ['50%'],
+            folder: 'assets/highlights/',
+            size: '320x?'
+        });
+    return deferred.promise;
+}
+
+function createMetadata(id) {
+
 }
 
 function filterEmptyFile(fileName) {
@@ -146,6 +177,6 @@ function deleteFile(filePath) {
     });
 }
 
-function currentTimeMillis() {
+function generateId() {
     return new Date().getTime();
 }
