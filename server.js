@@ -78,7 +78,7 @@ function startRecording() {
                 })
                 .on('end', function () {
                     deleteFile(tempRecordingPath);
-                    console.log('Transcoding ended. What does that mean?!?!?');
+                    startRecording();
                 })
                 .save(tempRecordingPath)
         };
