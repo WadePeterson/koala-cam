@@ -7,14 +7,6 @@ module.exports = React.createClass({
         onPlaybackRateChange: React.PropTypes.func.isRequired
     },
 
-    componentDidMount(){
-        this.updateVideoSettings();
-    },
-
-    componentDidUpdate() {
-        this.updateVideoSettings();
-    },
-
     render() {
         return (
             <div className="playback-rate-control">
@@ -25,14 +17,6 @@ module.exports = React.createClass({
                 <span>{Math.round(this.props.playbackRate * 100)}%</span>
             </div>
         );
-    },
-
-    updateVideoSettings() {
-        var video = React.findDOMNode(this.refs.videoPlayer);
-
-        if (video) {
-            video.playbackRate = this.props.playbackRate;
-        }
     },
 
     onChange(event) {
