@@ -34,7 +34,7 @@ app.get('/highlights', function(req,res) {
             .filter(filterEmptyFile)
             .map(function (fileName) {
                 return +fileName.match('[0-9]+')[0];
-            }).unique().sort().value());
+            }).unique().sort().reverse().value());
     });
 });
 

@@ -1,5 +1,7 @@
 var React = require('react');
+
 var ActionCreator = require('../utils/ActionCreator');
+var Button = require('react-bootstrap').Button;
 var HighlightContainer = require('./HighlightContainer.jsx');
 var HighlightStore = require('../stores/HighlightStore');
 var Video = require('./Video.jsx');
@@ -42,7 +44,7 @@ module.exports = React.createClass({
                         <Video {...this.state.videoControlSettings} />
                     </div>
                     <div className="controls playback-controls">
-                        <button>+</button>
+                        <Button>+</Button>
                         <button>-</button>
                     </div>
                 </div>

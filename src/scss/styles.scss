@@ -9,18 +9,23 @@ body {
 #header {
   background-image: url(http://i.huffpost.com/gen/2080788/images/o-KOALA-FIGHT-facebook.jpg);
   background-repeat: repeat;
-  background-size: 162px;
+  background-size: 100px;
   color: black;
   font-family: ComicSansMS;
-  font-size: 3em;
+  font-size: 20px;
   text-align: center;
+  height: 50px;
+
+  marquee {
+    height: 50px;
+  }
 }
 
 #content {
   height: 100%;
 
   > div > div {
-    margin-bottom: 20px;
+    margin-top: 20px;
   }
 }
 
@@ -28,6 +33,7 @@ body {
   color: #CCC;
   text-align: center;
   width: 100%;
+  margin: 10px 0 10px 0;
 }
 
 .video-container {
@@ -42,7 +48,7 @@ body {
   .controls {
     text-align: center;
     vertical-align: middle;
-    width: 25%;
+    width: 24%;
 
     &.capture-controls {
       button {

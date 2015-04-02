@@ -14,7 +14,7 @@ var _videoControlSettings = {
 
 var HighlightStore = StoreCreator.create({
     getAllHighlights() {
-        return _.clone(_highlights).sort();
+        return _.clone(_highlights);
     },
 
     getVideoControlSettings() {
@@ -31,7 +31,7 @@ HighlightStore.dispatchToken = Dispatcher.register(payload => {
             break;
         case ActionTypes.NEW_HIGHLIGHT_RECEIVED:
             _videoControlSettings.src = 'highlights/highlight-' + action.highlight + '.mp4';
-            _highlights.push(action.highlight);
+            _highlights.unshift(action.highlight);
             break;
         case ActionTypes.HIGHLIGHTS_RECEIVED:
             // TODO: If highlights become more than just URLs, then this needs to be smarter
