@@ -36,6 +36,14 @@ body {
   font-size: 10px;
 }
 
+.controls {
+  color: #CCC;
+
+  .playback-rate-control {
+    display: inline-block;
+  }
+}
+
 .video-container {
   display: table;
   table-layout: fixed;

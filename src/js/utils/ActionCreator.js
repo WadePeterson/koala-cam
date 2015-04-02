@@ -10,6 +10,13 @@ module.exports = {
         });
     },
 
+    changePlaybackRate(playbackRate) {
+        Dispatcher.handleViewAction({
+            type: ActionTypes.CHANGE_PLAYBACK_RATE,
+            playbackRate: playbackRate
+        });
+    },
+
     createHighlight() {
         $.ajax('savehighlight', {
             method: 'POST'

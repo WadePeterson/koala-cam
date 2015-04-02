@@ -29,6 +29,9 @@ HighlightStore.dispatchToken = Dispatcher.register(payload => {
         case ActionTypes.CHANGE_ACTIVE_HIGHLIGHT:
             _videoControlSettings.src = 'highlights/highlight-' + action.highlight + '.mp4';
             break;
+        case ActionTypes.CHANGE_PLAYBACK_RATE:
+            _videoControlSettings.playbackRate = action.playbackRate;
+            break;
         case ActionTypes.NEW_HIGHLIGHT_RECEIVED:
             _videoControlSettings.src = 'highlights/highlight-' + action.highlight + '.mp4';
             _highlights.unshift(action.highlight);
