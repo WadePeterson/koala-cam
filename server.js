@@ -6,10 +6,6 @@ var fs = require('fs');
 
 var app = express();
 
-function filterEmptyFile(fileName) {
-    return fileName !== 'empty';
-}
-
 app.listen(3000, function () {
     fs.readdir('temp', function (err, fileNames) {
         _(fileNames).filter(filterEmptyFile).map(function (fileName) {
@@ -35,25 +31,30 @@ app.get('/highlights', function(req,res) {
             .filter(filterEmptyFile)
             .map(function (fileName) {
                 return +fileName.match('[0-9]+')[0];
-            }).unique().sort().reverse().value());
+            }).unique().sort().reverse().map(getHighlight).value());
     });
 });
 
-app.post('/highlight', function(req,res) {
+app.put('/highlight', function(req,res) {
     var recording = currentRecording;
 
     recording.command.on('error', function (err) {
-        saveHighlight(recording.path, function (highlightTimestamp) {
-            res.send('' + highlightTimestamp);
+        saveHighlight(recording.path, function (timestamp) {
+            res.send(getHighlight(timestamp));
         });
     }).kill('SIGINT');
 
     startRecording();
 });
 
+app.post('/highlight/:id', function(req,res) {
+    res.send(getHighlight(req.params.id));
+});
+
 app.delete('/highlight/:timestamp', function(req,res) {
     deleteFile('assets/highlights/highlight-' + req.params.timestamp + '.mp4');
     deleteFile('assets/highlights/thumbnail-' + req.params.timestamp + '.jpg');
+    res.end();
 });
 
 var highlightDuration = 7;
@@ -89,6 +90,15 @@ function startRecording() {
     });
 }
 
+function getHighlight(id) {
+    return {
+        id: id,
+        isHot: false,
+        thumbnailUrl: 'highlights/thumbnail-' + id + '.jpg',
+        videoUrl: 'highlights/highlight-' + id + '.mp4'
+    };
+}
+
 function saveHighlight(tempRecordingPath, callback) {
     var timeStamp = currentTimeMillis();
     var highlightPath = 'assets/highlights/highlight-' + timeStamp + '.mp4';
@@ -121,6 +131,10 @@ function saveHighlight(tempRecordingPath, callback) {
             })
             .save(highlightPath)
     });
+}
+
+function filterEmptyFile(fileName) {
+    return fileName !== 'empty';
 }
 
 function deleteFile(filePath) {

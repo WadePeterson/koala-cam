@@ -43,7 +43,7 @@ module.exports = React.createClass({
                         <PlaybackRateControl playbackRate={this.state.videoControlSettings.playbackRate} onPlaybackRateChange={this.onPlaybackRateChange} />
                         <Video {...this.state.videoControlSettings} />
                     </div>
-                    <HighlightContainer highlights={this.state.highlights} onHighlightClick={this.changeActiveHighlight} onHighlightDeleteClick={this.deleteHighlight} />
+                    <HighlightContainer highlights={this.state.highlights} onHighlightSelect={this.changeActiveHighlight} onDeleteClick={this.deleteHighlight} onHotClick={this.toggleHotness} />
                 </div>
             </div>
         );
@@ -63,5 +63,9 @@ module.exports = React.createClass({
 
     onPlaybackRateChange(playbackRate) {
         ActionCreator.changePlaybackRate(playbackRate);
+    },
+
+    toggleHotness(highlight) {
+        ActionCreator.toggleHotness(highlight);
     }
 });

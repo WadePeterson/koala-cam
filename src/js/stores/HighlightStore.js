@@ -27,7 +27,7 @@ HighlightStore.dispatchToken = Dispatcher.register(payload => {
 
     switch(action.type) {
         case ActionTypes.CHANGE_ACTIVE_HIGHLIGHT:
-            _videoControlSettings.src = 'highlights/highlight-' + action.highlight + '.mp4';
+            _videoControlSettings.src = action.highlight.videoUrl;
             break;
         case ActionTypes.CHANGE_PLAYBACK_RATE:
             _videoControlSettings.playbackRate = action.playbackRate;
@@ -36,12 +36,15 @@ HighlightStore.dispatchToken = Dispatcher.register(payload => {
             _highlights = _.filter(_highlights, highlight => action.highlight !== highlight);
             break;
         case ActionTypes.NEW_HIGHLIGHT_RECEIVED:
-            _videoControlSettings.src = 'highlights/highlight-' + action.highlight + '.mp4';
+            _videoControlSettings.src = action.highlight.videoUrl;
             _highlights.unshift(action.highlight);
             break;
+        case ActionTypes.TOGGLE_HIGHLIGHT_HOTNESS:
+            var highlight = _.find(_highlights, highlight => highlight.id === action.highlight.id);
+            highlight.isHot = !highlight.isHot;
+            break;
         case ActionTypes.HIGHLIGHTS_RECEIVED:
-            // TODO: If highlights become more than just URLs, then this needs to be smarter
-            _highlights = _.union(_highlights, action.highlights);
+            _highlights = action.highlights;
             break;
     }
 

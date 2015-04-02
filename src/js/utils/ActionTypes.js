@@ -5,6 +5,7 @@ module.exports = keyMirror({
     CHANGE_ACTIVE_HIGHLIGHT: null,
     CHANGE_PLAYBACK_RATE: null,
     DELETE_HIGHLIGHT: null,
+    TOGGLE_HIGHLIGHT_HOTNESS: null,
 
     // server actions
     NEW_HIGHLIGHT_RECEIVED: null,

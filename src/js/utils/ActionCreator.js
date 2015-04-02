@@ -19,7 +19,7 @@ module.exports = {
 
     createHighlight() {
         $.ajax('highlight', {
-            method: 'POST'
+            method: 'PUT'
         }).done(highlight => {
             Dispatcher.handleServerAction({
                 type: ActionTypes.NEW_HIGHLIGHT_RECEIVED,
@@ -29,7 +29,7 @@ module.exports = {
     },
 
     deleteHighlight(highlight) {
-        $.ajax('highlight/' + highlight, {
+        $.ajax('highlight/' + highlight.id, {
             method: 'DELETE'
         });
         Dispatcher.handleViewAction({
@@ -46,6 +46,19 @@ module.exports = {
                 type: ActionTypes.HIGHLIGHTS_RECEIVED,
                 highlights: highlights
             });
+        });
+    },
+
+    toggleHotness(highlight) {
+        $.ajax('highlight/' + highlight.id, {
+            method: 'POST',
+            data: {
+                hot: !highlight.isHot
+            }
+        });
+        Dispatcher.handleViewAction({
+            type: ActionTypes.TOGGLE_HIGHLIGHT_HOTNESS,
+            highlight: highlight
         });
     }
 };

@@ -103,7 +103,7 @@ body {
       padding: 10px;
       margin-bottom: 5px;
 
-      &:hover button.delete {
+      &:hover button, button.hot.active {
         display: block;
       }
 
@@ -112,16 +112,29 @@ body {
         width: 100%;
       }
 
-      button.delete {
-        background-color: #333;
-        color: #999;
+      button {
         opacity: 0.5;
         display: none;
         position: absolute;
-        top: 13px;
-        right: 13px;
+        z-index: 999;
 
-        &:hover {
+        &.delete {
+          background-color: #333;
+          color: #999;
+          border-color: #999;
+          top: 13px;
+          right: 13px;
+        }
+
+        &.hot {
+          color: #c65313;
+          background-color: #f0ad4e;
+          border-color: #c65313;
+          top: 13px;
+          left: 13px;
+        }
+
+        &:hover, &.active {
           opacity: 1;
         }
       }
