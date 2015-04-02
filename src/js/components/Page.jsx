@@ -47,7 +47,7 @@ module.exports = React.createClass({
                     <div className="video-container">
                         <Video {...this.state.videoControlSettings} />
                     </div>
-                    <HighlightContainer highlights={this.state.highlights} onHighlightClick={this.changeActiveHighlight}/>
+                    <HighlightContainer highlights={this.state.highlights} onHighlightClick={this.changeActiveHighlight} onHighlightDeleteClick={this.deleteHighlight} />
                 </div>
             </div>
         );
@@ -59,6 +59,10 @@ module.exports = React.createClass({
 
     changeActiveHighlight(highlight) {
         ActionCreator.changeActiveHighlight(highlight);
+    },
+
+    deleteHighlight(highlight) {
+        ActionCreator.deleteHighlight(highlight);
     },
 
     onPlaybackRateChange(playbackRate) {

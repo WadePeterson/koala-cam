@@ -39,7 +39,7 @@ app.get('/highlights', function(req,res) {
     });
 });
 
-app.post('/savehighlight', function(req,res) {
+app.post('/highlight', function(req,res) {
     var recording = currentRecording;
 
     recording.command.on('error', function (err) {
@@ -49,6 +49,11 @@ app.post('/savehighlight', function(req,res) {
     }).kill('SIGINT');
 
     startRecording();
+});
+
+app.delete('/highlight/:timestamp', function(req,res) {
+    deleteFile('assets/highlights/highlight-' + req.params.timestamp + '.mp4');
+    deleteFile('assets/highlights/thumbnail-' + req.params.timestamp + '.jpg');
 });
 
 var highlightDuration = 7;
