@@ -40,7 +40,7 @@ module.exports = React.createClass({
                 <div className="controls">
                     <PlaybackRateControl playbackRate={this.state.videoControlSettings.playbackRate} onPlaybackRateChange={this.onPlaybackRateChange} />
                     <div className="buttons">
-                        <Button bsStyle='success' onClick={this.createHighlight}>Capture Highlight!</Button>
+                        <Button bsStyle='success' bsSize="large" onClick={this.createHighlight}>Capture Highlight!</Button>
                     </div>
                 </div>
                 <div className="video-content-container">
