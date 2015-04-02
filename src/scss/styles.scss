@@ -100,7 +100,7 @@ body {
     .thumbnail-container {
       position: relative;
       background-color: #666;
-      padding: 10px;
+      padding: 10px 10px 5px 10px;
       margin-bottom: 5px;
 
       &:hover button, button.hot.active {
@@ -140,9 +140,19 @@ body {
       }
 
       .highlight-title {
+        border: 1px solid transparent;
         color: #CCC;
-        margin-top: 10px;
+        min-height: 34px;
+        padding-top: 5px;
         text-align: center;
+
+        &:hover {
+          border: 1px solid #EEE;
+        }
+      }
+
+      .highlight-title, .highlight-title-editor {
+        margin-top: 5px;
       }
     }
   }

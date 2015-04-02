@@ -50,18 +50,26 @@ module.exports = {
     },
 
     toggleHotness(highlight) {
-        $.ajax('highlight/' + highlight.id, {
-            method: 'POST',
-            contentType: 'application/json; charset=UTF-8',
-            data: JSON.stringify({
-                metadata: _.merge({}, highlight.metadata, {
-                    isHot: !highlight.metadata.isHot
-                })
-            })
-        });
-        Dispatcher.handleViewAction({
-            type: ActionTypes.TOGGLE_HIGHLIGHT_HOTNESS,
-            highlight: highlight
-        });
+        updateMetadata(highlight, { isHot: !highlight.metadata.isHot });
+    },
+
+    updateHighlightTitle(highlight, newTitle) {
+        updateMetadata(highlight, { title: newTitle });
     }
 };
+
+function updateMetadata(highlight, metadataChanges) {
+    var newMetadata = _.merge({}, highlight.metadata, metadataChanges);
+    $.ajax('highlight/' + highlight.id, {
+        method: 'POST',
+        contentType: 'application/json; charset=UTF-8',
+        data: JSON.stringify({
+            metadata: newMetadata
+        })
+    });
+    Dispatcher.handleViewAction({
+        type: ActionTypes.UPDATE_HIGHLIGHT_METADATA,
+        highlight: highlight,
+        newMetadata: newMetadata
+    });
+}

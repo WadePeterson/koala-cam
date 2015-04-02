@@ -39,9 +39,8 @@ HighlightStore.dispatchToken = Dispatcher.register(payload => {
             _videoControlSettings.src = action.highlight.videoUrl;
             _highlights.unshift(action.highlight);
             break;
-        case ActionTypes.TOGGLE_HIGHLIGHT_HOTNESS:
-            var highlight = _.find(_highlights, highlight => highlight.id === action.highlight.id);
-            highlight.metadata.isHot = !highlight.metadata.isHot;
+        case ActionTypes.UPDATE_HIGHLIGHT_METADATA:
+            _.find(_highlights, highlight => highlight.id === action.highlight.id).metadata = action.newMetadata;
             break;
         case ActionTypes.HIGHLIGHTS_RECEIVED:
             _highlights = action.highlights;
