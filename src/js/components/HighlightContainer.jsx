@@ -17,6 +17,7 @@ module.exports = React.createClass({
                     <img src={highlight.thumbnailUrl} onClick={() => this.props.onHighlightSelect(highlight)} />
                     <Button className={hotClasses} bsSize="large" onClick={() => this.props.onHotClick(highlight)}></Button>
                     { highlight.metadata.isHot ? null : <Button className="delete glyphicon glyphicon-trash" bsSize="large" onClick={() => this.props.onDeleteClick(highlight)}></Button> }
+                    <div className="highlight-title">{highlight.metadata.title}</div>
                 </div>
             );
         });

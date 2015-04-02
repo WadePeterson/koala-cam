@@ -124,7 +124,11 @@ function saveHighlight(tempRecordingPath) {
         }).then(function (highlightPath) {
             return createThumbnail(highlightPath, id);
         }).then(function () {
-            return writeMetadataFile(id, {isHot: false});
+            var date = new Date(id);
+            return writeMetadataFile(id, {
+                isHot: false,
+                title: date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
+            });
         }).then(function () {
             return id;
         });
