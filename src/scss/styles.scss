@@ -24,10 +24,8 @@ body {
 
 #content {
   height: 100%;
-
-  > div > div {
-    margin-top: 20px;
-  }
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 #footer {
@@ -47,35 +45,20 @@ body {
     display: table-cell;
   }
 
-  .controls {
-    text-align: center;
-    vertical-align: middle;
-    width: 24%;
-
-    &.capture-controls {
-      button {
-        font-size: 2em;
-      }
-    }
-  }
-
   video {
     display: block;
-    margin-left: auto;
-    margin-right: auto;
     width: 100%;
   }
 }
 
 .highlight-container {
   background-color: #CCC;
-  overflow-x: scroll;
-  white-space: nowrap;
+  width: 20%;
+  min-width: 150px;
+  overflow-y: auto;
+  vertical-align: top;
 
   > div {
-    display: inline-block;
-    padding: 10px 10px 0 10px;
-
     img {
       cursor: pointer;
     }

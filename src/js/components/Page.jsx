@@ -36,19 +36,15 @@ module.exports = React.createClass({
     render() {
         return (
             <div>
-                <div className="video-container">
-                    <div className="controls capture-controls">
-                        <button className="highlight" onClick={this.createHighlight}>Capture Highlight!</button>
-                    </div>
-                    <div>
-                        <Video {...this.state.videoControlSettings} />
-                    </div>
-                    <div className="controls playback-controls">
-                        <Button>+</Button>
-                        <button>-</button>
-                    </div>
+                <div className="controls">
+                    <button className="highlight" onClick={this.createHighlight}>Capture Highlight!</button>
+                    <Button>+</Button>
+                    <button>-</button>
                 </div>
-                <HighlightContainer highlights={this.state.highlights} onHighlightClick={this.changeActiveHighlight}/>
+                <div className="video-container">
+                    <Video {...this.state.videoControlSettings} />
+                    <HighlightContainer highlights={this.state.highlights} onHighlightClick={this.changeActiveHighlight}/>
+                </div>
             </div>
         );
     },
