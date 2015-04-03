@@ -19,10 +19,12 @@ app.listen(3000, function () {
         });
     });
 
-    getAllHighlights().then(function(highlights){
-        _(highlights).filter(function (highlight) {
-            return !highlight.metadata.isHot && (new Date().getTime() - highlight.id) > (1000 * 60 * 60);
-        }).pluck('id').each(deleteHighlight).value();
+    createSupportingFilesForLegacyHighlights().then(function () {
+        getAllHighlights().then(function (highlights) {
+            _(highlights).filter(function (highlight) {
+                return !highlight.metadata.isHot && (new Date().getTime() - highlight.id) > (1000 * 60 * 60);
+            }).pluck('id').each(deleteHighlight).value();
+        });
     });
 });
 
@@ -121,7 +123,7 @@ function getHighlight(id) {
     fs.readFile('assets/highlights/metadata-' + id + '.json', function(err, data) {
         deferred.resolve({
             id: id,
-            metadata: JSON.parse(data),
+            metadata: data && JSON.parse(data),
             thumbnailUrl: 'highlights/thumbnail-' + id + '.jpg',
             videoUrl: 'highlights/highlight-' + id + '.mp4'
         });
@@ -134,21 +136,36 @@ function saveHighlight(tempRecordingPath) {
 
     return getFfmpegMetadata(tempRecordingPath)
         .then(function (ffmpegMetadata) {
-            return parseTempVideo(ffmpegMetadata, tempRecordingPath, id);
+            return createHighlightVideo(ffmpegMetadata, tempRecordingPath, id);
         }).then(function (highlightPath) {
-            return createThumbnail(highlightPath, id);
-        }).then(function () {
-            var date = new Date(id);
-            return writeMetadataFile(id, {
-                isHot: false,
-                title: date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
-            });
+            return createSupportingFiles(highlightPath, id);
         }).then(function () {
             return id;
         });
 }
 
-function parseTempVideo(ffmpegMetadata, tempRecordingPath, id) {
+function createSupportingFilesForLegacyHighlights() {
+    return getAllHighlights().then(function(highlights){
+        return Q.all(_(highlights).filter(function (highlight){
+            return !highlight.metadata;
+        }).map(function(highlight) {
+            return createSupportingFiles('assets/' + highlight.videoUrl, highlight.id, {isHot: true});
+        }).value());
+    });
+}
+
+function createSupportingFiles(highlightPath, id, additionalMetadata) {
+    var date = new Date(id);
+    return Q.all([
+        createThumbnail(highlightPath, id),
+        writeMetadataFile(id, _.merge({
+            isHot: false,
+            title: date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
+        }, additionalMetadata))
+    ]);
+}
+
+function createHighlightVideo(ffmpegMetadata, tempRecordingPath, id) {
     var highlightPath = 'assets/highlights/highlight-' + id + '.mp4';
 
     var deferred = Q.defer();
@@ -162,7 +179,7 @@ function parseTempVideo(ffmpegMetadata, tempRecordingPath, id) {
             deleteFile(tempRecordingPath);
             deferred.resolve(highlightPath);
         })
-        .save(highlightPath)
+        .save(highlightPath);
     return deferred.promise;
 }
 
