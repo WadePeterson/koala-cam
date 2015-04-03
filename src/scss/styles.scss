@@ -140,28 +140,37 @@ body {
         }
       }
 
-      .highlight-title {
-        border: 1px solid transparent;
-        color: #CCC;
-        min-height: 34px;
-        padding-top: 5px;
-        text-align: center;
+      .highlight-title-container {
 
-        &:hover {
-          border: 1px solid #EEE;
+        .highlight-title {
+          border: 1px solid transparent;
+          color: #CCC;
+          min-height: 34px;
+          padding-top: 5px;
+          text-align: center;
+
+          &:hover {
+            border: 1px solid #EEE;
+          }
+
+          .highlight-tag, .highlight-owner {
+            color: #46bde2;
+          }
+
+          .highlight-tag {
+            font-weight: bold;
+          }
+
         }
 
-        .highlight-tag, .highlight-owner {
-          color: #46bde2;
+        .highlight-title, .highlight-title-editor {
+          margin-top: 5px;
         }
 
-        .highlight-tag {
-          font-weight: bold;
+        .suggestion-popup {
+          position: absolute !important;
+          bottom: 17px;
         }
-      }
-
-      .highlight-title, .highlight-title-editor {
-        margin-top: 5px;
       }
     }
   }

@@ -1,5 +1,6 @@
 var React = require('react');
 var Input = require('react-bootstrap').Input;
+var SuggestionPopup = require('./SuggestionPopup.jsx');
 
 module.exports = React.createClass({
     propTypes: {
@@ -25,16 +26,44 @@ module.exports = React.createClass({
     },
 
     render() {
-        return this.state.inEditMode ? (
+        var availableItems = ['@Jonathan', '#toolking', '#grandma', '#jerk'];
+        var searchText = this.getSearchText();
+
+        var content = this.state.inEditMode ? [
+            searchText && _.contains(['#', '@'], searchText[0]) && <SuggestionPopup searchText={this.getSearchText()} availableItems={availableItems} onItemSelect={this.onSuggestionSelect} />,
             <Input standalone className="highlight-title-editor" ref="input" autoFocus="true" type="text" value={this.state.title} onBlur={this.onEditorBlur} onChange={this.onEditorChange} onKeyUp={this.onKeyUp} />
-        ) : (
-            <div className="highlight-title" onClick={this.onTitleClick}>{this.parseTitle()}</div>
-        );
+        ] : <div className="highlight-title" onClick={this.onTitleClick}>{this.parseTitle()}</div>;
+
+        return <div className="highlight-title-container">{content}</div>
+    },
+
+    getIndexOfCurrentWord() {
+        var inputDom = this.refs.input && this.refs.input.getInputDOMNode();
+        if (inputDom) {
+            var count = 0;
+            return _.findIndex(inputDom.value.split(' '), word => {
+                count += word.length + 1;
+                return count >= inputDom.selectionStart;
+            });
+        }
+        return -1;
+    },
+
+    getSearchText() {
+        var inputDom = this.refs.input && this.refs.input.getInputDOMNode();
+        if (inputDom) {
+            var count = 0;
+            return _.find(inputDom.value.split(' '), word => {
+                count += word.length + 1;
+                return count >= inputDom.selectionStart;
+            });
+        }
+        return null;
     },
 
     onEditorBlur(event) {
-        this.props.onTitleChange(event.target.value);
-        this.setState({ inEditMode: false });
+        //this.props.onTitleChange(event.target.value);
+        //this.setState({ inEditMode: false });
     },
 
     onEditorChange(event) {
@@ -45,6 +74,15 @@ module.exports = React.createClass({
         if(event.keyCode === 13) {
             this.onEditorBlur(event);
         }
+    },
+
+    onSuggestionSelect(selectedText) {
+        var inputDom = this.refs.input.getInputDOMNode();
+        var words = inputDom.value.split(' ');
+        words[this.getIndexOfCurrentWord()] = selectedText;
+        inputDom.value = words.join(' ') + ' ';
+        inputDom.selectionStart = inputDom.value.length;
+        inputDom.focus();
     },
 
     onTitleClick() {
