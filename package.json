@@ -27,6 +27,7 @@
     "webpack": "^1.7.3"
   },
   "scripts": {
+    "build": "npm install;webpack",
     "start": "node server.js"
   },
   "repository": {
