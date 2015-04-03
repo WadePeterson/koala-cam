@@ -18,6 +18,12 @@ app.listen(3000, function () {
             startRecording();
         });
     });
+
+    getAllHighlights().then(function(highlights){
+        _(highlights).filter(function (highlight) {
+            return !highlight.metadata.isHot && (new Date().getTime() - highlight.id) > (1000 * 60 * 60);
+        }).pluck('id').each(deleteHighlight).value();
+    });
 });
 
 app.use(express.static(__dirname + '/assets'));
@@ -29,17 +35,8 @@ app.get('/', function(req,res) {
 });
 
 app.get('/highlights', function(req,res) {
-    fs.readdir('assets/highlights', function (err, fileNames) {
-        Q.all(
-            _(fileNames)
-                .filter(filterEmptyFile)
-                .map(function (fileName) {
-                    return +fileName.match('[0-9]+')[0];
-                })
-                .unique().sort().reverse().map(getHighlight).value()
-        ).then(function (results) {
-            res.send(results);
-        });
+    getAllHighlights().then(function (highlights) {
+        res.send(highlights);
     });
 });
 
@@ -62,14 +59,31 @@ app.post('/highlight/:id', function(req,res) {
 });
 
 app.delete('/highlight/:id', function(req,res) {
-    deleteFile('assets/highlights/highlight-' + req.params.id + '.mp4');
-    deleteFile('assets/highlights/metadata-' + req.params.id + '.json');
-    deleteFile('assets/highlights/thumbnail-' + req.params.id + '.jpg');
+    deleteHighlight(req.params.id);
     res.end();
 });
 
 var highlightDuration = 7;
 var currentRecording = {};
+
+function deleteHighlight(id) {
+    deleteFile('assets/highlights/highlight-' + id + '.mp4');
+    deleteFile('assets/highlights/metadata-' + id + '.json');
+    deleteFile('assets/highlights/thumbnail-' + id + '.jpg');
+}
+
+function getAllHighlights() {
+    var deferred = Q.defer();
+    fs.readdir('assets/highlights', function (err, fileNames) {
+        Q.all(_(fileNames)
+            .filter(filterEmptyFile)
+            .map(function (fileName) {
+                return +fileName.match('[0-9]+')[0];
+            })
+            .unique().sort().reverse().map(getHighlight).value()).then(deferred.resolve);
+    });
+    return deferred.promise;
+}
 
 function startRecording() {
     exec('ffmpeg -f avfoundation -list_devices true -i ""', function (err, stdout) {
