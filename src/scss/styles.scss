@@ -124,7 +124,7 @@ body {
           color: #999;
           border-color: #999;
           top: 13px;
-          right: 13px;
+          left: 13px;
         }
 
         &.hot {
@@ -132,7 +132,7 @@ body {
           background-color: #f0ad4e;
           border-color: #c65313;
           top: 13px;
-          left: 13px;
+          right: 13px;
         }
 
         &:hover, &.active {
