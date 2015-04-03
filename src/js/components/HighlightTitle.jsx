@@ -28,7 +28,7 @@ module.exports = React.createClass({
         return this.state.inEditMode ? (
             <Input standalone className="highlight-title-editor" ref="input" autoFocus="true" type="text" value={this.state.title} onBlur={this.onEditorBlur} onChange={this.onEditorChange} onKeyUp={this.onKeyUp} />
         ) : (
-            <div className="highlight-title" onClick={this.onTitleClick}>{this.state.title}</div>
+            <div className="highlight-title" onClick={this.onTitleClick}>{this.parseTitle()}</div>
         );
     },
 
@@ -49,6 +49,12 @@ module.exports = React.createClass({
 
     onTitleClick() {
         this.setState({ inEditMode: true });
+    },
+
+    parseTitle() {
+        return this.state.title.split(' ').map(function(word, index, words) {
+            return <span className={{ '#': 'highlight-tag', '@': 'highlight-owner'}[word[0]]}>{word + (index === words.length - 1 ? '' : ' ')}</span>;
+        });
     }
 });
 
