@@ -37,7 +37,7 @@ module.exports = React.createClass({
     render() {
         return (
             <div>
-                <Button bsStyle='success' bsSize="large" className="save-highlight-button" onClick={this.createHighlight}>Capture Highlight!</Button>
+                <Button autoFocus="true" bsStyle="success" bsSize="large" className="save-highlight-button" onClick={this.createHighlight} onMouseOver={this.onCaptureButtonMouseOver}>Capture Highlight!</Button>
                 <div className="video-content-container">
                     <div className="video-container">
                         <PlaybackRateControl playbackRate={this.state.videoControlSettings.playbackRate} onPlaybackRateChange={this.onPlaybackRateChange} />
@@ -59,6 +59,10 @@ module.exports = React.createClass({
 
     deleteHighlight(highlight) {
         ActionCreator.deleteHighlight(highlight);
+    },
+
+    onCaptureButtonMouseOver(event) {
+        event.target.focus();
     },
 
     onPlaybackRateChange(playbackRate) {

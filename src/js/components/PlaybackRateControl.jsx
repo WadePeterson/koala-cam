@@ -8,10 +8,10 @@ module.exports = React.createClass({
 
     render() {
         return (
-            <div className="playback-rate-control">
+            <div className="playback-rate-control" onMouseOut={this.onMouseOut}>
                 <label>
                     <div>Speed: {Math.round(this.props.playbackRate * 100)}%</div>
-                    <input type="range" min="0.1" max="2.0" step="0.1" value={this.props.playbackRate} onChange={this.onChange} />
+                    <input ref="input" type="range" min="0.1" max="2.0" step="0.1" value={this.props.playbackRate} onChange={this.onChange} />
                 </label>
             </div>
         );
@@ -19,5 +19,9 @@ module.exports = React.createClass({
 
     onChange(event) {
         this.props.onPlaybackRateChange(+event.target.value);
+    },
+
+    onMouseOut(event) {
+        this.refs.input.blur();
     }
 });
